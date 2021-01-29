@@ -10,7 +10,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const {mongoDbUrl} =  require('./config/database');
 
-const {select, generateTime} = require('./helpers/handlebars-helpers');
+const {select, generateTime,paginate} = require('./helpers/handlebars-helpers');
 const passport = require('passport');
 
 
@@ -29,7 +29,7 @@ console.log(__dirname);
 
 //set view engine
 
-app.engine('handlebars',exphbs({defaultLayout:'home', helpers: { select: select, generateTime: generateTime }}));
+app.engine('handlebars',exphbs({defaultLayout:'home', helpers: { select: select, generateTime: generateTime, paginate: paginate}}));
 app.set('view engine','handlebars');
 
 //upload middleware

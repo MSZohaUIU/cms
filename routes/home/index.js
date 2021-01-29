@@ -34,13 +34,27 @@ router.get('/', (req,res)=>{
     //res.send('Its WOrks');
     //console.log(path.join(__dirname, 'public'));
 
-    Post.find({}).then(posts=>{
-        
-        category.find({}).then(categories=>{
+    const perPage = 10;
+    const page = req.query.page || 1;
 
-            res.render('home/index', {posts: multipleMongooseToObj(posts), categories: multipleMongooseToObj(categories)});
+    Post.find({})
+        .skip((perPage * page) - perPage).limit(perPage)
+        .then(posts=>{
+        Post.count().then(postCount=>{
+
+            category.find({}).then(categories=>{
+
+                res.render('home/index', 
+                {posts: multipleMongooseToObj(posts),
+                categories: multipleMongooseToObj(categories),
+                current: parseInt(page),
+                pages: Math.ceil( postCount / perPage )
+                });
+                
+            });
 
         });
+        
     });
     
 });
@@ -208,9 +222,12 @@ router.post('/register', (req,res)=>{
 
 });
 
-router.get('/post/:id', (req,res)=>{
+router.get('/post/:slug', (req,res)=>{ 
+//router.get('/post/:id', (req,res)=>{
 
-    Post.findOne({_id: req.params.id})
+
+    Post.findOne({slug: req.params.slug})
+    //Post.findOne({_id: req.params.id})
     .populate({path : 'comments', match:{approveComment:true}, populate: {path : 'user', model: 'users'}})
     .populate('user')
     .then(posts=>{
